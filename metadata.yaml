@@ -1,0 +1,5 @@
+name: strbot_plugin_SillyTavern_card
+desc: 将SillyTavern角色PNG卡转换为Lorebook YAML
+version: v1.0.0
+author: LKarxa
+repo: https://github.com/LKarxa/astrbot_plugin_SillyTavern_card
