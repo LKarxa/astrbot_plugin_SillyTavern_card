@@ -1,9 +1,10 @@
 import os
 import json
 from typing import Optional, Dict, Any, Tuple
+from pathlib import Path
 
 from astrbot.api.event import filter, AstrMessageEvent
-from astrbot.api.star import Context, Star, register
+from astrbot.api.star import Context, Star, register, StarTools
 from astrbot.api import logger
 import astrbot.api.message_components as Comp
 
@@ -14,23 +15,27 @@ from .json_to_lorebook_yaml import json_to_lorebook_yaml
 class CardConverterPlugin(Star):
     def __init__(self, context: Context):
         super().__init__(context)
-        # 确保输出目录存在
-        self.data_dir = os.path.join(os.getcwd(), "data")
-        self.output_dir = os.path.join(self.data_dir, "lorebooks")
+        # 使用 StarTools.get_data_dir 获取插件数据目录
+        plugin_data_dir = StarTools.get_data_dir("strbot_plugin_SillyTavern_card")
+        self.data_dir = str(plugin_data_dir)
+        
+        # lorebook相关路径保持不变
+        self.output_dir = os.path.join(os.getcwd(), "data", "lorebooks")
+        
         self.char_dir = os.path.join(self.data_dir, "characters")
         
         # 创建card目录用于存放PNG文件
-        self.plugin_dir = os.path.dirname(os.path.abspath(__file__))
-        self.card_dir = os.path.join(self.plugin_dir, "card")
+        self.card_dir = os.path.join(self.data_dir, "card")
         
         # 确保所有必要的目录都存在
         os.makedirs(self.output_dir, exist_ok=True)
         os.makedirs(self.char_dir, exist_ok=True)
         os.makedirs(self.card_dir, exist_ok=True)
         
+        logger.info(f"插件数据目录: {self.data_dir}")
         logger.info(f"卡片目录已创建: {self.card_dir}")
-        logger.info(f"输出目录已创建: {self.output_dir}")
         logger.info(f"角色目录已创建: {self.char_dir}")
+        logger.info(f"输出目录已创建: {self.output_dir}")
 
     @filter.command("convert_card")
     async def convert_card(self, event: AstrMessageEvent, filename: str = ""):
